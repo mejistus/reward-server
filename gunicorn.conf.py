@@ -27,7 +27,7 @@ def child_exit(server, worker):
 # Gunicorn Configuration
 bind = f"127.0.0.1:{port}"
 # for cross node access
-# bind = "0.0.0.0:18085"
+# bind = f"0.0.0.0:{port}"
 workers = NUM_DEVICES
 worker_class = "sync"
 timeout = 120

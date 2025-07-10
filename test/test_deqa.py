@@ -16,8 +16,6 @@ def f(_):
         batch_paths = paths[i : i + BATCH_SIZE]
 
         jpeg_data = []
-        queries = []
-        answers = []
         for path in batch_paths:
             image = Image.open(path)
 
@@ -38,9 +36,7 @@ def f(_):
         print(response.content)
         response_data = pickle.loads(response.content)
 
-        for output in response_data["outputs"]:
-            print(output)
-            print("--")
+        print(response_data)
 
 # with ThreadPoolExecutor(max_workers=8) as executor:
 #     for _ in executor.map(f, range(8)):
