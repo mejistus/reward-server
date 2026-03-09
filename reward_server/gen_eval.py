@@ -21,8 +21,8 @@ from clip_benchmark.metrics import zeroshot_classification as zsc
 zsc.tqdm = lambda it, *args, **kwargs: it
 
 DEVICE = "cuda"
-MY_CONFIG_PATH="your_mmdetection_path/mmdetection/configs/mask2former/mask2former_swin-s-p4-w7-224_lsj_8x2_50e_coco.py"
-MY_CKPT_PATH="your_reward-server_path/reward-server/model/mask2former2"
+MY_CONFIG_PATH="configs/mask2former/mask2former_swin-s-p4-w7-224_lsj_8x2_50e_coco.py"
+MY_CKPT_PATH="model/mask2former2"
 
 def load_geneval():
     def timed(fn):
@@ -39,7 +39,7 @@ def load_geneval():
     @timed
     def load_models():
         CONFIG_PATH = os.path.join(
-                os.path.dirname(mmdet.__file__),
+                os.path.dirname(os.path.dirname(mmdet.__file__)),
                 MY_CONFIG_PATH
             )
         OBJECT_DETECTOR = "mask2former_swin-s-p4-w7-224_lsj_8x2_50e_coco"

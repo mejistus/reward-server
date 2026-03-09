@@ -1,5 +1,5 @@
 import os
-NUM_DEVICES = 8
+NUM_DEVICES = 1
 USED_DEVICES = set()
 
 # reward='deqa'
