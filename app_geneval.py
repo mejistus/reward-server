@@ -2,9 +2,17 @@ from PIL import Image
 from io import BytesIO
 import pickle
 import traceback
-from reward_server.gen_eval import load_geneval
-import numpy as np
 import os
+
+# Switch backend to the MPS-friendly implementation when running on
+# Apple Silicon (or anywhere mmdet/mmcv isn't available). Setting
+# GENEVAL_BACKEND=mmdet keeps the legacy CUDA/mm-det path.
+if os.environ.get("GENEVAL_BACKEND", "mps") == "mps":
+    from reward_server.gen_eval_mps import load_geneval
+else:
+    from reward_server.gen_eval import load_geneval
+
+import numpy as np
 
 from flask import Flask, request, Blueprint
 
@@ -18,16 +26,12 @@ def create_app():
     app.register_blueprint(root)
     return app
 
-@root.route("/", methods=["POST"]) 
+@root.route("/", methods=["POST"])
 def inference():
     print(f"received POST request from {request.remote_addr}")
     data = request.get_data()
 
     try:
-        # expects a dict with "images", "queries", and optionally "answers"
-        # images: (batch_size,) of JPEG bytes
-        # queries: (batch_size, num_queries_per_image) of strings
-        # answers: (batch_size, num_queries_per_image) of strings
         data = pickle.loads(data)
 
         images = [Image.open(BytesIO(d), formats=["jpeg"]) for d in data["images"]]
@@ -40,11 +44,6 @@ def inference():
 
         response = {"scores": scores, "rewards": rewards, "strict_rewards": strict_rewards, "group_rewards": group_rewards, "group_strict_rewards": group_strict_rewards}
 
-        # returns: a dict with "outputs" and optionally "scores"
-        # outputs: (batch_size, num_queries_per_image) of strings
-        # precision: (batch_size, num_queries_per_image) of floats
-        # recall: (batch_size, num_queries_per_image) of floats
-        # f1: (batch_size, num_queries_per_image) of floats
         response = pickle.dumps(response)
 
         returncode = 200
